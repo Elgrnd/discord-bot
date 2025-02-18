@@ -1,7 +1,7 @@
 import discord
-from discordId import clientId
+from dotenv import load_dotenv
+import os
 from datetime import datetime
-import asyncio
 from datetime import datetime, timedelta
 
 client = discord.Client(intents=discord.Intents.all())
@@ -109,4 +109,6 @@ async def checkTime():
 
 
 if __name__ == '__main__':
+    load_dotenv()
+    clientId = os.getenv("clientId")
     client.run(clientId)

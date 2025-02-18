@@ -154,7 +154,20 @@ async def on_message(message: discord.Message):
             date = birthdays[user_id]
             await message.channel.send(f"🎉 {message.author.mention}, ta date d'anniversaire est le {date}.")
         else:
-            await message.channel.send(f"❌ {message.author.mention}, aucune date entrée.")        
+            await message.channel.send(f"❌ {message.author.mention}, aucune date entrée.")      
+
+    # Commande -anniv (supprimer un anniversaire)
+    if message.content.startswith("-anniv"):
+        user_id = str(message.author.id)
+
+        if user_id in birthdays:
+            # Supprime l'anniversaire de l'utilisateur
+            del birthdays[user_id]
+            with open(birthdays_file_path, "w") as file:
+                json.dump(birthdays, file)
+            await message.channel.send(f"🎉 L'anniversaire de {message.author.mention} a été supprimé !")
+        else:
+            await message.channel.send(f"❌ {message.author.mention}, tu n'as pas d'anniversaire enregistré.")  
 
 """
 ***************************************************************************************

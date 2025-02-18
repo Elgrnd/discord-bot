@@ -145,6 +145,16 @@ async def on_message(message: discord.Message):
         except (IndexError, ValueError):
             await message.channel.send("Format invalide ! Utilise : `+anniv JJ/MM`")
 
+    # Commande +checkanniv
+    if message.content.startswith("+checkanniv"):
+        user_id = str(message.author.id)
+
+        if user_id in birthdays:
+            date = birthdays[user_id]
+            await message.channel.send(f"🎉 {message.author.mention}, ta date d'anniversaire est le {date}.")
+        else:
+            await message.channel.send(f"❌ {message.author.mention}, aucune date entrée.")        
+
 """
 ***************************************************************************************
 ************************** Afficherl'anniversaire *************************************

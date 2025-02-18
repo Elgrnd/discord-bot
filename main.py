@@ -7,10 +7,11 @@ import asyncio
 from datetime import datetime
 
 client = discord.Client(intents=discord.Intents.all())
+birthdays_file_path = "data/birthdays.json"
 
 # Chargement des anniversaires enregistrés
 try:
-    with open("birthdays.json", "r") as file:
+    with open(birthdays_file_path, "r") as file:
         birthdays = json.load(file)
 except FileNotFoundError:
     birthdays = {}
@@ -137,7 +138,7 @@ async def on_message(message: discord.Message):
             user_id = str(message.author.id)
             birthdays[user_id] = date 
 
-            with open("birthdays.json", "w") as file:
+            with open(birthdays_file_path, "w") as file:
                 json.dump(birthdays, file)
 
             await message.channel.send(f"🎉 {message.author.mention}, ton anniversaire est enregistré pour le {date} !")

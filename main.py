@@ -1,11 +1,19 @@
 import discord
+from discord.ext import tasks
 from dotenv import load_dotenv
 import os
+import json
+import asyncio
 from datetime import datetime
-from datetime import datetime, timedelta
 
 client = discord.Client(intents=discord.Intents.all())
 
+# Chargement des anniversaires enregistrés
+try:
+    with open("birthdays.json", "r") as file:
+        birthdays = json.load(file)
+except FileNotFoundError:
+    birthdays = {}
 """
 ***************************************************************************************
 ****************** AFFICHE SI LE BOT EST EN LIGNE ET SUR QUELS SERVEURS ***************
@@ -18,6 +26,7 @@ async def on_ready():
     for server in client.guilds:
         print(f'{server.name}(id: {server.id})')
     #client.loop.create_task(checkTime())
+    check_birthdays.start()
 
 """
 ***************************************************************************************
@@ -106,6 +115,55 @@ async def checkTime():
         await send_daily_message()
 '''
 
+"""
+***************************************************************************************
+************************** Ajouter sa date d'anniversaire *************************
+***************************************************************************************
+"""
+
+@client.event
+async def on_message(message: discord.Message):
+    if message.author.bot:
+        return
+    
+     # Vérifie si la commande est exécutée dans le bon salon
+    if message.channel.id != 1204848074930004048:
+        return  # Ignore les autres salons
+    
+    if message.content.startswith("+anniv"):
+        try:
+            date = message.content.split(" ")[1]
+            datetime.strptime(date, "%d/%m")
+            user_id = str(message.author.id)
+            birthdays[user_id] = date 
+
+            with open("birthdays.json", "w") as file:
+                json.dump(birthdays, file)
+
+            await message.channel.send(f"🎉 {message.author.mention}, ton anniversaire est enregistré pour le {date} !")
+        except (IndexError, ValueError):
+            await message.channel.send("Format invalide ! Utilise : `+anniv JJ/MM`")
+
+"""
+***************************************************************************************
+************************** Afficherl'anniversaire *************************************
+***************************************************************************************
+"""
+
+@tasks.loop(hours=24)
+async def check_birthdays():
+    """Vérifie chaque jour si c'est l'anniversaire d'un utilisateur et envoie un message."""
+    await client.wait_until_ready()
+    today = datetime.today().strftime("%d/%m")
+
+    for user_id, birth_date in birthdays.items():
+        if birth_date == today:
+            user = await client.fetch_user(int(user_id))
+            if user:
+                # Remplace "général" par l'ID de ton salon (ex: 1234567890)
+                channel = discord.utils.get(client.get_all_channels(), name="général")
+                if channel:
+                    await channel.send(f"🎂 Joyeux anniversaire {user.mention} ! 🥳🎉")
 
 
 if __name__ == '__main__':

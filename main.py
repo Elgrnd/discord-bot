@@ -137,6 +137,9 @@ async def on_message(message: discord.Message):
             date = message.content.split(" ")[1]
             datetime.strptime(date, "%d/%m")
             user_id = str(message.author.id)
+            if user_id in birthdays:
+                await message.channel.send(f"{message.author.mention}, ton anniversaire est déjà entré !")
+                return
             birthdays[user_id] = date 
 
             with open(birthdays_file_path, "w") as file:

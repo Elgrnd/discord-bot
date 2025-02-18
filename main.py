@@ -7,7 +7,8 @@ import asyncio
 from datetime import datetime
 
 client = discord.Client(intents=discord.Intents.all())
-birthdays_file_path = "data/birthdays.json"
+persistent_dir = "/mnt/data"
+birthdays_file_path = os.path.join(persistent_dir, "birthdays.json")
 
 # Chargement des anniversaires enregistrés
 try:

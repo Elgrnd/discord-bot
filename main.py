@@ -1,4 +1,5 @@
 import discord
+from discord.ext import commands
 from discord.ext import tasks
 from dotenv import load_dotenv
 import os
@@ -6,7 +7,7 @@ import json
 import asyncio
 from datetime import datetime
 
-client = discord.Client(intents=discord.Intents.all())
+bot = commands.Bot(command_prefix='+', intents=discord.Intents.all())
 persistent_dir = "/mnt/data"
 birthdays_file_path = os.path.join(persistent_dir, "birthdays.json")
 
@@ -22,10 +23,10 @@ except FileNotFoundError:
 ***************************************************************************************
 """
 
-@client.event
+@bot.event
 async def on_ready():
-    print(f"{client.user.name} is ready")
-    for server in client.guilds:
+    print(f"{bot.user.name} is ready")
+    for server in bot.guilds:
         print(f'{server.name}(id: {server.id})')
     #client.loop.create_task(checkTime())
     check_birthdays.start()
@@ -36,7 +37,7 @@ async def on_ready():
 ***************************************************************************************
 """
 
-@client.event
+@bot.event
 async def on_message(message : discord.Message):
     if message.author.bot:
         return
@@ -77,7 +78,7 @@ def changerUrl(message : discord.Message):
 ***************************************************************************************
 """
 
-@client.event
+@bot.event
 async def on_member_join(member : discord.member):
     role = discord.utils.get(member.guild.roles, id=1199720777382105160)
     await member.add_roles(role)
@@ -123,56 +124,83 @@ async def checkTime():
 ***************************************************************************************
 """
 
-@client.event
-async def on_message(message: discord.Message):
-    if message.author.bot:
+@bot.command()
+async def anniv(ctx, date: str):
+
+    if ctx.channel.id != 1341520022194884669:
         return
     
-     # Vérifie si la commande est exécutée dans le bon salon
-    if message.channel.id != 1341520022194884669:
-        return  # Ignore les autres salons
+    await ctx.message.delete()
+
+    """Ajoute l'anniversaire de l'utilisateur (format: JJ/MM)."""
+    user_id = str(ctx.author.id)
     
-    await message.delete()
+    try:
+        datetime.strptime(date, "%d/%m")
+        if user_id in birthdays:
+            await ctx.send(f"{ctx.author.mention}, ton anniversaire est déjà entré !")
+            return
+        birthdays[user_id] = date
+
+        with open(birthdays_file_path, "w") as file:
+            json.dump(birthdays, file)
+
+        await ctx.send(f"🎉 {ctx.author.mention}, ton anniversaire est enregistré pour le {date} !")
+    except ValueError:
+        await ctx.send("Format invalide ! Utilise : `+anniv JJ/MM`")
+
+@bot.command()
+async def checkanniv(ctx):
+
+    if ctx.channel.id != 1341520022194884669:
+        return
     
-    if message.content.startswith("+anniv"):
-        try:
-            date = message.content.split(" ")[1]
-            datetime.strptime(date, "%d/%m")
-            user_id = str(message.author.id)
-            if user_id in birthdays:
-                await message.channel.send(f"{message.author.mention}, ton anniversaire est déjà entré !")
-                return
-            birthdays[user_id] = date 
+    await ctx.message.delete()
 
-            with open(birthdays_file_path, "w") as file:
-                json.dump(birthdays, file)
+    """Vérifie si l'utilisateur a enregistré son anniversaire."""
+    user_id = str(ctx.author.id)
 
-            await message.channel.send(f"🎉 {message.author.mention}, ton anniversaire est enregistré pour le {date} !")
-        except (IndexError, ValueError):
-            await message.channel.send("Format invalide ! Utilise : `+anniv JJ/MM`")
+    if user_id in birthdays:
+        date = birthdays[user_id]
+        await ctx.send(f"🎉 {ctx.author.mention}, ta date d'anniversaire est le {date}.")
+    else:
+        await ctx.send(f"❌ {ctx.author.mention}, aucune date entrée.")
 
-    # Commande +checkanniv
-    if message.content.startswith("+checkanniv"):
-        user_id = str(message.author.id)
+@bot.command()
+async def checkanniv(ctx, member: discord.Member):
 
-        if user_id in birthdays:
-            date = birthdays[user_id]
-            await message.channel.send(f"🎉 {message.author.mention}, ta date d'anniversaire est le {date}.")
-        else:
-            await message.channel.send(f"❌ {message.author.mention}, aucune date entrée.")      
+    if ctx.channel.id != 1341520022194884669:
+        return
+    
+    await ctx.message.delete()
 
-    # Commande -anniv (supprimer un anniversaire)
-    if message.content.startswith("-anniv"):
-        user_id = str(message.author.id)
+    """Vérifie si l'utilisateur a enregistré son anniversaire."""
+    user_id = str(member.id)
 
-        if user_id in birthdays:
-            # Supprime l'anniversaire de l'utilisateur
-            del birthdays[user_id]
-            with open(birthdays_file_path, "w") as file:
-                json.dump(birthdays, file)
-            await message.channel.send(f"🎉 L'anniversaire de {message.author.mention} a été supprimé !")
-        else:
-            await message.channel.send(f"❌ {message.author.mention}, tu n'as pas d'anniversaire enregistré.")  
+    if user_id in birthdays:
+        date = birthdays[user_id]
+        await ctx.send(f"🎉 {ctx.author.mention}, ta date d'anniversaire est le {date}.")
+    else:
+        await ctx.send(f"❌ {ctx.author.mention}, aucune date entrée.")
+
+@bot.command()
+async def delanniv(ctx):
+
+    if ctx.channel.id != 1341520022194884669:
+        return
+    
+    await ctx.message.delete()
+
+    """Supprime l'anniversaire de l'utilisateur."""
+    user_id = str(ctx.author.id)
+
+    if user_id in birthdays:
+        del birthdays[user_id]
+        with open(birthdays_file_path, "w") as file:
+            json.dump(birthdays, file)
+        await ctx.send(f"🎉 L'anniversaire de {ctx.author.mention} a été supprimé !")
+    else:
+        await ctx.send(f"❌ {ctx.author.mention}, tu n'as pas d'anniversaire enregistré.")
 
 """
 ***************************************************************************************
@@ -183,15 +211,14 @@ async def on_message(message: discord.Message):
 @tasks.loop(hours=24)
 async def check_birthdays():
     """Vérifie chaque jour si c'est l'anniversaire d'un utilisateur et envoie un message."""
-    await client.wait_until_ready()
+    await bot.wait_until_ready()
     today = datetime.today().strftime("%d/%m")
 
     for user_id, birth_date in birthdays.items():
         if birth_date == today:
-            user = await client.fetch_user(int(user_id))
+            user = await bot.fetch_user(int(user_id))
             if user:
-                # Remplace "général" par l'ID de ton salon (ex: 1234567890)
-                channel = discord.utils.get(client.get_all_channels(), id=1341520022194884669)
+                channel = discord.utils.get(bot.get_all_channels(), id=1341520022194884669)
                 if channel:
                     await channel.send(f"🎂 Joyeux anniversaire {user.mention} ! 🥳🎉 @everyone")
 
@@ -199,4 +226,4 @@ async def check_birthdays():
 if __name__ == '__main__':
     load_dotenv()
     clientId = os.getenv("clientId")
-    client.run(clientId)
+    bot.run(clientId)

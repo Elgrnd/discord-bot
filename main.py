@@ -193,7 +193,7 @@ async def check_birthdays():
                 # Remplace "général" par l'ID de ton salon (ex: 1234567890)
                 channel = discord.utils.get(client.get_all_channels(), id=1341520022194884669)
                 if channel:
-                    await channel.send(f"🎂 Joyeux anniversaire {user.mention} ! 🥳🎉")
+                    await channel.send(f"🎂 Joyeux anniversaire {user.mention} ! 🥳🎉 @everyone")
 
 
 if __name__ == '__main__':

@@ -132,6 +132,8 @@ async def on_message(message: discord.Message):
     if message.channel.id != 1341520022194884669:
         return  # Ignore les autres salons
     
+    await message.delete()
+    
     if message.content.startswith("+anniv"):
         try:
             date = message.content.split(" ")[1]

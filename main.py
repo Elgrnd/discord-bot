@@ -173,7 +173,7 @@ async def checkanniv(ctx, member: discord.Member = None):
         await ctx.send(f"❌ {member} n'a pas d'anniversaire enregistré.")
 
 @bot.command()
-async def checkallaniv(ctx):
+async def checkallanniv(ctx):
     """Liste tous les utilisateurs et leurs anniversaires."""
     
     if ctx.channel.id != 1341520022194884669:
@@ -190,9 +190,9 @@ async def checkallaniv(ctx):
     for user_id, date in birthdays.items():
         member = ctx.guild.get_member(int(user_id))
         if member:
-            all_birthdays += f"{member}: {date}\n"
+            all_birthdays += f"{member} : {date}\n"
         else:
-            all_birthdays += f"[Membre introuvable] {user_id}: {date}\n"
+            all_birthdays += f"[Membre introuvable] {user_id} : {date}\n"
 
     await ctx.send(f"🎉 **Liste des anniversaires :**\n{all_birthdays}")
 

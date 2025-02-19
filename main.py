@@ -129,7 +129,7 @@ async def on_message(message: discord.Message):
         return
     
      # Vérifie si la commande est exécutée dans le bon salon
-    if message.channel.id != 1204848074930004048:
+    if message.channel.id != 1341520022194884669:
         return  # Ignore les autres salons
     
     if message.content.startswith("+anniv"):
@@ -189,7 +189,7 @@ async def check_birthdays():
             user = await client.fetch_user(int(user_id))
             if user:
                 # Remplace "général" par l'ID de ton salon (ex: 1234567890)
-                channel = discord.utils.get(client.get_all_channels(), name="général")
+                channel = discord.utils.get(client.get_all_channels(), id=1341520022194884669)
                 if channel:
                     await channel.send(f"🎂 Joyeux anniversaire {user.mention} ! 🥳🎉")
 

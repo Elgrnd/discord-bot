@@ -48,6 +48,9 @@ async def on_message(message : discord.Message):
         await message.channel.send(f"{message.author.mention} le goat a drop ce tweet zinzin : {message_return}")
         print(message.author, datetime.now)
 
+    await bot.process_commands(message)
+
+
 def changerUrl(message : discord.Message):
     url = []
     lien = ""
@@ -79,7 +82,7 @@ def changerUrl(message : discord.Message):
 """
 
 @bot.event
-async def on_member_join(member : discord.member):
+async def on_member_join(member : discord.Member):
     role = discord.utils.get(member.guild.roles, id=1199720777382105160)
     await member.add_roles(role)
 

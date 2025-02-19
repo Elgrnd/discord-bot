@@ -39,6 +39,7 @@ async def on_ready():
 
 @bot.event
 async def on_message(message : discord.Message):
+
     if message.author.bot:
         return
     
@@ -171,6 +172,31 @@ async def checkanniv(ctx, member: discord.Member = None):
     else:
         await ctx.send(f"❌ {member} n'a pas d'anniversaire enregistré.")
 
+@bot.command()
+async def checkallaniv(ctx):
+    """Liste tous les utilisateurs et leurs anniversaires."""
+    
+    if ctx.channel.id != 1341520022194884669:
+        return
+
+    await ctx.message.delete()
+
+    if not birthdays:
+        await ctx.send("❌ Il n'y a aucun anniversaire enregistré.")
+        return
+    
+    # Crée une liste formatée des anniversaires
+    all_birthdays = ""
+    for user_id, date in birthdays.items():
+        member = ctx.guild.get_member(int(user_id))
+        if member:
+            all_birthdays += f"{member}: {date}\n"
+        else:
+            all_birthdays += f"[Membre introuvable] {user_id}: {date}\n"
+
+    await ctx.send(f"🎉 **Liste des anniversaires :**\n{all_birthdays}")
+
+
 
 @bot.command()
 async def delanniv(ctx):
@@ -211,6 +237,18 @@ async def check_birthdays():
                 if channel:
                     await channel.send(f"🎂 Joyeux anniversaire {user.mention} ! 🥳🎉 @everyone")
 
+"""
+***************************************************************************************
+************************** Clear channel *************************************
+***************************************************************************************
+"""
+
+@bot.command()
+async def clear(ctx):
+    
+    if ctx.author.id == 736602549066661889:
+        await ctx.channel.purge()
+        await ctx.send("`Salon nettoyé`")
 
 if __name__ == '__main__':
     load_dotenv()

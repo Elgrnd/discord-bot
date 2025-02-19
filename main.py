@@ -150,38 +150,24 @@ async def anniv(ctx, date: str):
         await ctx.send("Format invalide ! Utilise : `+anniv JJ/MM`")
 
 @bot.command()
-async def checkanniv(ctx):
+async def checkanniv(ctx, member: discord.Member = None):
+    """Vérifie si l'utilisateur ou un autre membre a enregistré son anniversaire."""
 
     if ctx.channel.id != 1341520022194884669:
         return
-    
+
     await ctx.message.delete()
 
-    """Vérifie si l'utilisateur a enregistré son anniversaire."""
-    user_id = str(ctx.author.id)
-
-    if user_id in birthdays:
-        date = birthdays[user_id]
-        await ctx.send(f"🎉 {ctx.author.mention}, ta date d'anniversaire est le {date}.")
-    else:
-        await ctx.send(f"❌ {ctx.author.mention}, aucune date entrée.")
-
-@bot.command()
-async def checkanniv(ctx, member: discord.Member):
-
-    if ctx.channel.id != 1341520022194884669:
-        return
-    
-    await ctx.message.delete()
-
-    """Vérifie si l'utilisateur a enregistré son anniversaire."""
+    # Si aucun membre n'est précisé, on utilise l'auteur du message
+    member = member or ctx.author
     user_id = str(member.id)
 
     if user_id in birthdays:
         date = birthdays[user_id]
-        await ctx.send(f"🎉 {ctx.author.mention}, ta date d'anniversaire est le {date}.")
+        await ctx.send(f"🎉 {member}, l'anniversaire est enregistré pour le {date}.")
     else:
-        await ctx.send(f"❌ {ctx.author.mention}, aucune date entrée.")
+        await ctx.send(f"❌ {member} n'a pas d'anniversaire enregistré.")
+
 
 @bot.command()
 async def delanniv(ctx):

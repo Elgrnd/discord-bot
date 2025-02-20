@@ -51,7 +51,6 @@ async def on_message(message : discord.Message):
 
     await bot.process_commands(message)
 
-
 def changerUrl(message : discord.Message):
     url = []
     lien = ""
@@ -89,48 +88,13 @@ async def on_member_join(member : discord.Member):
 
 """
 ***************************************************************************************
-************************** ENVOYER MESSAGE LOL TOUS LES JOURS *************************
-***************************************************************************************
-"""
-
-"""
-async def send_daily_message():
-    # Obtient l'objet canal en fonction de l'ID
-    channel = client.get_channel(1199722180976590969)
-    
-    if channel is not None:
-        # Envoie le message
-        await channel.send(f"__**League Of Legends**__\n\n`Qui 5v5 ce soir ?` <@&1201581459580923905> \n\n\t> Présent → `🟢`\n\t> Absent → `🔴`\n\n*Donnez une heure aussi :clock1: *")
-"""
-'''
-
-@client.event
-async def checkTime():
-    while True:
-        # Récupère l'heure actuelle
-        now = datetime.now()
-        # Définit l'heure à laquelle le message doit être envoyé (16h)
-        target_time = now.replace(hour=16, minute=00, second=00, microsecond=0)
-        # Si l'heure actuelle est supérieure ou égale à l'heure cible, calcule l'heure pour le lendemain
-        if now >= target_time:
-            target_time += timedelta(days=1)
-        # Calcule la différence de temps jusqu'à l'heure cible
-        delta = target_time - now
-        # Attendez jusqu'à l'heure cible pour envoyer le message
-        await asyncio.sleep(delta.total_seconds())
-        # Envoyer le message quotidien
-        await send_daily_message()
-'''
-
-"""
-***************************************************************************************
-************************** Ajouter sa date d'anniversaire *************************
+****************** Ajouter / Supprimer / Regarder sa date d'anniversaire **************
 ***************************************************************************************
 """
 
 @bot.command()
 async def anniv(ctx, date: str):
-
+    """Ajoute la date en paramètre comme anniversaire de l'utilisateur"""
     if ctx.channel.id != 1341520022194884669:
         return
     
@@ -196,11 +160,9 @@ async def checkallanniv(ctx):
 
     await ctx.send(f"🎉 **Liste des anniversaires :**\n{all_birthdays}")
 
-
-
 @bot.command()
 async def delanniv(ctx):
-
+    """Supprime son propre anniversaire"""
     if ctx.channel.id != 1341520022194884669:
         return
     
@@ -227,19 +189,29 @@ async def delanniv(ctx):
 async def check_birthdays():
     """Vérifie chaque jour si c'est l'anniversaire d'un utilisateur et envoie un message."""
     await bot.wait_until_ready()
+
+    # Recharge les anniversaires depuis le fichier JSON
+    try:
+        with open(birthdays_file_path, "r") as file:
+            loaded_birthdays = json.load(file)
+    except (FileNotFoundError, json.JSONDecodeError):
+        loaded_birthdays = {}
+
     today = datetime.today().strftime("%d/%m")
 
-    for user_id, birth_date in birthdays.items():
+    for user_id, birth_date in loaded_birthdays.items():
         if birth_date == today:
             user = await bot.fetch_user(int(user_id))
             if user:
                 channel = discord.utils.get(bot.get_all_channels(), id=1341520022194884669)
                 if channel:
-                    await channel.send(f"🎂 Joyeux anniversaire {user.mention} ! 🥳🎉 @everyone")
+                    message = await channel.send(f"🎂 Joyeux anniversaire {user.mention} ! 🥳🎉 @everyone")
+                    await message.add_reaction("🎉")
+                    await message.add_reaction("🥳")
 
 """
 ***************************************************************************************
-************************** Clear channel *************************************
+************************** Clear channel **********************************************
 ***************************************************************************************
 """
 
@@ -248,7 +220,10 @@ async def clear(ctx):
     
     if ctx.author.id == 736602549066661889:
         await ctx.channel.purge()
-        await ctx.send("`Salon nettoyé`")
+        await ctx.send("`✅ Salon nettoyé`")
+    else:
+        await ctx.message.delete()
+        await ctx.send("`❌ Tu n'as pas les droits !`")
 
 if __name__ == '__main__':
     load_dotenv()

@@ -36,7 +36,7 @@ async def on_ready():
 ************************** MODIFICATION DE LIEN TWITTER ET X **************************
 ***************************************************************************************
 """
-
+"""
 @bot.event
 async def on_message(message : discord.Message):
 
@@ -74,7 +74,7 @@ def changerUrl(message : discord.Message):
         url[0] += "vxtwitter"
         url = url[0] + url[1]
         return url
-
+"""
 """
 ***************************************************************************************
 ************************** NOUVEAU MEMBRE, ASSIGNATION DE ROLES ***********************

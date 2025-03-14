@@ -60,7 +60,7 @@ def changerUrl(message : discord.Message):
     if "/x." in message.content:
         for i in range(len(url) - 1):
             if url[i] == "x":
-                url[i] = "vxtwitter"
+                url[i] = "fixupx"
                 break
 
         for i in range(len(url) - 1):
@@ -71,7 +71,7 @@ def changerUrl(message : discord.Message):
     elif "/twitter." in message.content:
         url = message.content
         url = url.split("twitter")
-        url[0] += "vxtwitter"
+        url[0] += "fixupx"
         url = url[0] + url[1]
         return url
 """

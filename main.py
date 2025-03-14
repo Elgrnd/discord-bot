@@ -36,7 +36,7 @@ async def on_ready():
 ************************** MODIFICATION DE LIEN TWITTER ET X **************************
 ***************************************************************************************
 """
-"""
+
 @bot.event
 async def on_message(message : discord.Message):
 
@@ -52,21 +52,13 @@ async def on_message(message : discord.Message):
     await bot.process_commands(message)
 
 def changerUrl(message : discord.Message):
-    url = []
-    lien = ""
-    for char in message.content:
-        url.append(char)
     
     if "/x." in message.content:
-        for i in range(len(url) - 1):
-            if url[i] == "x":
-                url[i] = "fixupx"
-                break
-
-        for i in range(len(url) - 1):
-            lien += url[i]
-
-        return lien 
+        url = message.content
+        url = url.split("x.com")
+        url[0] += "fixupx.com"
+        url = url[0] + url[1]
+        return url
 
     elif "/twitter." in message.content:
         url = message.content
@@ -74,7 +66,7 @@ def changerUrl(message : discord.Message):
         url[0] += "fixupx"
         url = url[0] + url[1]
         return url
-"""
+
 """
 ***************************************************************************************
 ************************** NOUVEAU MEMBRE, ASSIGNATION DE ROLES ***********************

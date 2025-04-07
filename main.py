@@ -224,7 +224,7 @@ async def like(ctx, emoji: str):
         try:
             # Récupère le message auquel tu as répondu
             referenced_message = await ctx.channel.fetch_message(ctx.message.reference.message_id)
-            if emoji == "":
+            if emoji == None:
                 await ctx.message.add_reaction("❤️")
             else:
                 # Tente d'ajouter l'emoji en réaction

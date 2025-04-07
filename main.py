@@ -224,8 +224,11 @@ async def like(ctx, emoji: str):
         try:
             # Récupère le message auquel tu as répondu
             referenced_message = await ctx.channel.fetch_message(ctx.message.reference.message_id)
-            # Tente d'ajouter l'emoji en réaction
-            await referenced_message.add_reaction(emoji)
+            if emoji == "":
+                await ctx.message.add_reaction("❤️")
+            else:
+                # Tente d'ajouter l'emoji en réaction
+                await referenced_message.add_reaction(emoji)
             await ctx.message.add_reaction("✅")  # Confirmation visuelle
         except discord.HTTPException:
             await ctx.send("❌ L'emoji est invalide ou je ne peux pas l'utiliser.")
